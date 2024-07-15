@@ -1,12 +1,12 @@
 const API_KEY = "66959486232badc18de4d136";
-const URL = `https://userdatabase-d4a6.restdb.io/rest/users?key=${API_KEY}`;
+const URL = `https://userdatabase-d4a6.restdb.io/rest/users`;
 
 fetch(URL, {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
-    // access-controlle-allow-origin is a CORS header that allows you to specify domains that can access your API
     "Cache-Control": "no-cache",
+    "x-apikey": API_KEY,
   },
 })
   .then((response) => {
