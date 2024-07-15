@@ -1,27 +1,16 @@
-const API_KEY = "669580b8232bada2fde4d002";
-const URL = `https://userdatabase-d4a6.restdb.io/rest/users?key=${API_KEY}`;
-
-fetch(URL, {
-  method: "GET",
+fetch("https://userdatabase-d4a6.restdb.io/rest/users?key=669580b8232bada2fde4d002", {
+  method: "GET", // or POST, PUT, DELETE, etc.
   headers: {
     "Content-Type": "application/json",
-    "Cache-Control": "no-cache",
+    Accept: "application/json",
+    Origin: "https://simplethtmltest-c6bcftjra-patryks-projects-3dac6345.vercel.app",
   },
 })
   .then((response) => {
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error("Network response was not ok " + response.statusText);
     }
     return response.json();
   })
-  .then((data) => {
-    const userList = document.getElementById("user-list");
-    data.forEach((user) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = user.name;
-      userList.appendChild(listItem);
-    });
-  })
-  .catch((error) => {
-    console.error("Error fetching users:", error);
-  });
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error fetching users:", error));
