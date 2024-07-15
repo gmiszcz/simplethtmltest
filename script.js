@@ -1,23 +1,27 @@
-async function fetchUsers() {
-  try {
-    const response = await fetch("https://userdatabase-d4a6.restdb.io/rest/users?key=669580b8232bada2fde4d002", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      mode: "no-cors", // Make sure mode is set to 'cors'
-    });
+const API_KEY = "669580b8232bada2fde4d002";
+const URL = `https://userdatabase-d4a6.restdb.io/rest/users?key=${API_KEY}`;
 
+fetch(URL, {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+  },
+})
+  .then((response) => {
     if (!response.ok) {
-      throw new Error("Network response was not ok " + response.statusText);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
+    return response.json();
+  })
+  .then((data) => {
+    const userList = document.getElementById("user-list");
+    data.forEach((user) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = user.name;
+      userList.appendChild(listItem);
+    });
+  })
+  .catch((error) => {
     console.error("Error fetching users:", error);
-  }
-}
-
-fetchUsers();
+  });
