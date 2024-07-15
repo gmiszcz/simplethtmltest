@@ -6,7 +6,6 @@ fetch(URL, {
   headers: {
     "Content-Type": "application/json",
     // access-controlle-allow-origin is a CORS header that allows you to specify domains that can access your API
-    "Access-Control-Allow-Origin": "https://simplethtmltest-git-main-patryks-projects-3dac6345.vercel.app",
     "Cache-Control": "no-cache",
   },
 })
