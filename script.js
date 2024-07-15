@@ -6,7 +6,7 @@ async function fetchUsers() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      mode: "cors", // Make sure mode is set to 'cors'
+      mode: "no-cors", // Make sure mode is set to 'cors'
     });
 
     if (!response.ok) {
