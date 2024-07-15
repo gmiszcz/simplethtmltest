@@ -5,8 +5,8 @@ fetch(URL, {
   method: "GET",
   headers: {
     "Content-Type": "application/json",
-    "Cache-Control": "no-cache",
     "x-apikey": API_KEY,
+    "Cache-Control": "no-cache",
   },
 })
   .then((response) => {
