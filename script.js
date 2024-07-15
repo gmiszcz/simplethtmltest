@@ -1,5 +1,5 @@
 const API_KEY = "66959486232badc18de4d136";
-const URL = `https://userdatabase-d4a6.restdb.io/rest/users`;
+const URL = `https://userdatabase-d4a6.restdb.io/rest/users/`;
 
 fetch(URL, {
   method: "GET",
