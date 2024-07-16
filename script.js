@@ -37,7 +37,7 @@ class DataTable {
   }
 }
 
-function fetchData(url, headers, containerId) {
+function fetchData(url, columnheaders, containerId) {
   fetch(url, {
     method: "GET",
     headers: {
@@ -52,9 +52,9 @@ function fetchData(url, headers, containerId) {
       return response.json();
     })
     .then((data) => {
-      const dataTable = new DataTable(containerId, headers);
+      const dataTable = new DataTable(containerId, columnheaders);
       data.records.forEach((record) => {
-        const rowData = headers.map((header) => record.fields[header] || "No Data");
+        const rowData = columnheaders.map((header) => record.fields[header] || "No Data");
         dataTable.addRow(rowData);
       });
     })
@@ -67,6 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const userHeaders = ["Name", "Surname", "Email", "Issues", "Needs", "Description"];
   fetchData(USERS_URL, userHeaders, "user-table-container");
 
-  const treatmentHeaders = ["Name", "Description", "Price", "Visits"];
+  const treatmentHeaders = ["Name", "Description", "Price"];
   fetchData(TREATMENTS_URL, treatmentHeaders, "treatment-table-container");
 });
