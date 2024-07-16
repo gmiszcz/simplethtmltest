@@ -2,7 +2,8 @@ const API_KEY = "pat2vyyvaf2AIREq1.a63aeb49c64a3d009439291ec53082e518f6ffced9eae
 const BASE_ID = "appdtQMz1VcWrGaY2";
 
 const USERS_URL = `https://api.airtable.com/v0/${BASE_ID}/Users`;
-const TREATMENTS_URL = `https://api.airtable.com/v0/${BASE_ID}/Treatment`;
+const VISITS_URL = `https://api.airtable.com/v0/${BASE_ID}/Visits`;
+const TREATMENTS_URL = `https://api.airtable.com/v0/${BASE_ID}/Treatments`;
 
 class DataTable {
   constructor(containerId, headers) {
@@ -37,36 +38,64 @@ class DataTable {
   }
 }
 
-function fetchData(url, columnheaders, containerId) {
-  fetch(url, {
+async function fetchData(url) {
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
     },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const dataTable = new DataTable(containerId, columnheaders);
-      data.records.forEach((record) => {
-        const rowData = columnheaders.map((header) => record.fields[header] || "No Data");
-        dataTable.addRow(rowData);
-      });
-    })
-    .catch((error) => {
-      console.error(`Error fetching data from ${url}:`, error);
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.records;
+}
+
+async function createUsersTable() {
+  try {
+    const [users, visits, treatments] = await Promise.all([fetchData(USERS_URL), fetchData(VISITS_URL), fetchData(TREATMENTS_URL)]);
+
+    const treatmentMap = treatments.reduce((map, record) => {
+      map[record.id] = record.fields.Name;
+      return map;
+    }, {});
+
+    const userTable = new DataTable("user-table-container", ["Name", "Surname", "Email", "Issues", "Needs", "Visits"]);
+
+    users.forEach((user) => {
+      const userVisits = user.fields.Visits || [];
+      const visitNames = userVisits
+        .map((visitId) => {
+          const visit = visits.find((v) => v.id === visitId);
+          return visit ? treatmentMap[visit.fields.Treatment[0]] : "No Treatment";
+        })
+        .join(", ");
+
+      const userData = [user.fields.Name, user.fields.Surname, user.fields.Email, user.fields.Issues, user.fields.Needs, visitNames];
+      userTable.addRow(userData);
     });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+async function createTreatmentsTable() {
+  try {
+    const treatments = await fetchData(TREATMENTS_URL);
+    const treatmentTable = new DataTable("treatment-table-container", ["Name", "Description", "Price", "Visits"]);
+
+    treatments.forEach((treatment) => {
+      const treatmentData = [treatment.fields.Name, treatment.fields.Description, treatment.fields.Price, (treatment.fields.Visits || []).join(", ")];
+      treatmentTable.addRow(treatmentData);
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const userHeaders = ["Name", "Surname", "Email", "Issues", "Needs", "Description"];
-  fetchData(USERS_URL, userHeaders, "user-table-container");
-
-  const treatmentHeaders = ["Name", "Description", "Price"];
-  fetchData(TREATMENTS_URL, treatmentHeaders, "treatment-table-container");
+  createUsersTable();
+  createTreatmentsTable();
 });
