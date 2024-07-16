@@ -4,7 +4,7 @@ const URL = `https://userdatabase-d4a6.restdb.io/rest/users`;
 fetch(URL, {
   method: "GET",
   headers: {
-    "Content-Type": "application/json",
+    // "Content-Type": "application/json",
     "x-apikey": API_KEY,
     "Cache-Control": "no-cache",
   },
