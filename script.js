@@ -64,7 +64,7 @@ function fetchData(url, headers, containerId) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const userHeaders = ["Name", "Surname", "Email", "Issues", "Needs", "Visits"];
+  const userHeaders = ["Name", "Surname", "Email", "Issues", "Needs", "Description"];
   fetchData(USERS_URL, userHeaders, "user-table-container");
 
   const treatmentHeaders = ["Name", "Description", "Price", "Visits"];
