@@ -26,7 +26,7 @@ fetch(URL, {
         <td>${record.fields.Email}</td>
         <td>${record.fields.Issues}</td>
         <td>${record.fields.Needs}</td>
-        <td>${record.fields.Visits ? record.fields.Visits.join(", ") : "No Visits"}</td>
+        <td>${record.fields.Description}</td>
       `;
       userList.appendChild(listItem);
     });
