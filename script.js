@@ -1,36 +1,72 @@
 const API_KEY = "pat2vyyvaf2AIREq1.a63aeb49c64a3d009439291ec53082e518f6ffced9eae7428a9610bea0355686";
 const BASE_ID = "appdtQMz1VcWrGaY2";
-const TABLE_NAME = "Users";
-const URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
 
-fetch(URL, {
-  method: "GET",
-  headers: {
-    Authorization: `Bearer ${API_KEY}`,
-    "Content-Type": "application/json",
-  },
-})
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then((data) => {
-    const userList = document.getElementById("user-list");
-    data.records.forEach((record) => {
-      const listItem = document.createElement("tr");
-      listItem.innerHTML = `
-        <td>${record.fields.Name}</td>
-        <td>${record.fields.Surname}</td>
-        <td>${record.fields.Email}</td>
-        <td>${record.fields.Issues}</td>
-        <td>${record.fields.Needs}</td>
-        <td>${record.fields.Description}</td>
-      `;
-      userList.appendChild(listItem);
+const USERS_URL = `https://api.airtable.com/v0/${BASE_ID}/Users`;
+const TREATMENTS_URL = `https://api.airtable.com/v0/${BASE_ID}/Treatments`;
+
+class DataTable {
+  constructor(containerId, headers) {
+    this.container = document.getElementById(containerId);
+    this.headers = headers;
+    this.table = document.createElement("table");
+    this.table.className = "ui celled table";
+    this.createTable();
+  }
+
+  createTable() {
+    const thead = this.table.createTHead();
+    const headerRow = thead.insertRow();
+    this.headers.forEach((header) => {
+      const th = document.createElement("th");
+      th.textContent = header;
+      headerRow.appendChild(th);
     });
+    const tbody = document.createElement("tbody");
+    tbody.id = "table-body";
+    this.table.appendChild(tbody);
+    this.container.appendChild(this.table);
+  }
+
+  addRow(data) {
+    const tbody = this.table.querySelector("#table-body");
+    const row = tbody.insertRow();
+    data.forEach((cellData) => {
+      const cell = row.insertCell();
+      cell.textContent = cellData;
+    });
+  }
+}
+
+function fetchData(url, headers, containerId) {
+  fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+      "Content-Type": "application/json",
+    },
   })
-  .catch((error) => {
-    console.error("Error fetching users:", error);
-  });
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      const dataTable = new DataTable(containerId, headers);
+      data.records.forEach((record) => {
+        const rowData = headers.map((header) => record.fields[header] || "No Data");
+        dataTable.addRow(rowData);
+      });
+    })
+    .catch((error) => {
+      console.error(`Error fetching data from ${url}:`, error);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const userHeaders = ["Name", "Surname", "Email", "Issues", "Needs", "Visits"];
+  fetchData(USERS_URL, userHeaders, "user-table-container");
+
+  const treatmentHeaders = ["Name", "Description", "Price", "Visits"];
+  fetchData(TREATMENTS_URL, treatmentHeaders, "treatment-table-container");
+});
