@@ -1,11 +1,13 @@
-const API_KEY = "66959486232badc18de4d136";
-const URL = `https://userdatabase-d4a6.restdb.io/rest/users`;
+const API_KEY = "pat2vyyvaf2AIREq1.a63aeb49c64a3d009439291ec53082e518f6ffced9eae7428a9610bea0355686";
+const BASE_ID = "appdtQMz1VcWrGaY2";
+const TABLE_NAME = "Users";
+const URL = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
 
 fetch(URL, {
   method: "GET",
   headers: {
-    // "Content-Type": "application/json",
-    "x-apikey": API_KEY,
+    Authorization: `Bearer ${API_KEY}`,
+    "Content-Type": "application/json",
     "Cache-Control": "no-cache",
   },
 })
@@ -17,9 +19,9 @@ fetch(URL, {
   })
   .then((data) => {
     const userList = document.getElementById("user-list");
-    data.forEach((user) => {
+    data.records.forEach((record) => {
       const listItem = document.createElement("li");
-      listItem.textContent = user.name;
+      listItem.textContent = record.fields.Name; // Assuming the name field is "Name"
       userList.appendChild(listItem);
     });
   })
