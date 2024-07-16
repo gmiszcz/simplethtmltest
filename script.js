@@ -2,7 +2,7 @@ const API_KEY = "pat2vyyvaf2AIREq1.a63aeb49c64a3d009439291ec53082e518f6ffced9eae
 const BASE_ID = "appdtQMz1VcWrGaY2";
 
 const USERS_URL = `https://api.airtable.com/v0/${BASE_ID}/Users`;
-const TREATMENTS_URL = `https://api.airtable.com/v0/${BASE_ID}/Treatments`;
+const TREATMENTS_URL = `https://api.airtable.com/v0/${BASE_ID}/Treatment`;
 
 class DataTable {
   constructor(containerId, headers) {
