@@ -19,8 +19,15 @@ fetch(URL, {
   .then((data) => {
     const userList = document.getElementById("user-list");
     data.records.forEach((record) => {
-      const listItem = document.createElement("li");
-      listItem.textContent = record.fields.Name; // Assuming the name field is "Name"
+      const listItem = document.createElement("tr");
+      listItem.innerHTML = `
+        <td>${record.fields.Name}</td>
+        <td>${record.fields.Surname}</td>
+        <td>${record.fields.Email}</td>
+        <td>${record.fields.Issues}</td>
+        <td>${record.fields.Needs}</td>
+        <td>${record.fields.Visits ? record.fields.Visits.join(", ") : "No Visits"}</td>
+      `;
       userList.appendChild(listItem);
     });
   })
