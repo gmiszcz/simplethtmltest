@@ -53,49 +53,81 @@ async function fetchData(url) {
   return data.records;
 }
 
-async function createUsersTable() {
+async function createUsersTable(users, visits, treatments) {
+  const treatmentMap = treatments.reduce((map, record) => {
+    map[record.id] = record.fields.Name;
+    return map;
+  }, {});
+
+  const userTable = new DataTable("user-table-container", ["Name", "Surname", "Email", "Issues", "Needs", "Visits"]);
+
+  users.forEach((user) => {
+    const userVisits = user.fields.Visits || [];
+    const visitNames = userVisits
+      .map((visitId) => {
+        const visit = visits.find((v) => v.id === visitId);
+        return visit ? treatmentMap[visit.fields.Treatment[0]] : "No Treatment";
+      })
+      .join(", ");
+
+    const userData = [user.fields.Name, user.fields.Surname, user.fields.Email, user.fields.Issues, user.fields.Needs, visitNames];
+    userTable.addRow(userData);
+  });
+}
+
+async function createTreatmentsTable(visits, treatments) {
+  const visitMap = visits.reduce((map, visit) => {
+    visit.fields.Treatment.forEach((treatmentId) => {
+      if (!map[treatmentId]) {
+        map[treatmentId] = [];
+      }
+      map[treatmentId].push(visit.fields.Date);
+    });
+    return map;
+  }, {});
+
+  const treatmentTable = new DataTable("treatment-table-container", ["Name", "Description", "Price", "Visits"]);
+
+  treatments.forEach((treatment) => {
+    const treatmentVisits = visitMap[treatment.id] || [];
+    const treatmentData = [treatment.fields.Name, treatment.fields.Description, treatment.fields.Price, treatmentVisits.join(", ")];
+    treatmentTable.addRow(treatmentData);
+  });
+}
+
+async function createVisitsTable(users, visits, treatments) {
+  const userMap = users.reduce((map, user) => {
+    map[user.id] = `${user.fields.Name} ${user.fields.Surname}`;
+    return map;
+  }, {});
+
+  const treatmentMap = treatments.reduce((map, treatment) => {
+    map[treatment.id] = treatment.fields.Name;
+    return map;
+  }, {});
+
+  const visitTable = new DataTable("visit-table-container", ["User", "Date", "Treatment", "Price", "Comments"]);
+
+  visits.forEach((visit) => {
+    const visitData = [
+      visit.fields.User.map((userId) => userMap[userId]).join(", "),
+      visit.fields.Date,
+      visit.fields.Treatment.map((treatmentId) => treatmentMap[treatmentId]).join(", "),
+      visit.fields.Price,
+      visit.fields.Comments,
+    ];
+    visitTable.addRow(visitData);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
   try {
     const [users, visits, treatments] = await Promise.all([fetchData(USERS_URL), fetchData(VISITS_URL), fetchData(TREATMENTS_URL)]);
 
-    const treatmentMap = treatments.reduce((map, record) => {
-      map[record.id] = record.fields.Name;
-      return map;
-    }, {});
-
-    const userTable = new DataTable("user-table-container", ["Name", "Surname", "Email", "Issues", "Needs", "Visits"]);
-
-    users.forEach((user) => {
-      const userVisits = user.fields.Visits || [];
-      const visitNames = userVisits
-        .map((visitId) => {
-          const visit = visits.find((v) => v.id === visitId);
-          return visit ? treatmentMap[visit.fields.Treatment[0]] : "No Treatment";
-        })
-        .join(", ");
-
-      const userData = [user.fields.Name, user.fields.Surname, user.fields.Email, user.fields.Issues, user.fields.Needs, visitNames];
-      userTable.addRow(userData);
-    });
+    createUsersTable(users, visits, treatments);
+    createTreatmentsTable(visits, treatments);
+    createVisitsTable(users, visits, treatments);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
-}
-
-async function createTreatmentsTable() {
-  try {
-    const treatments = await fetchData(TREATMENTS_URL);
-    const treatmentTable = new DataTable("treatment-table-container", ["Name", "Description", "Price", "Visits"]);
-
-    treatments.forEach((treatment) => {
-      const treatmentData = [treatment.fields.Name, treatment.fields.Description, treatment.fields.Price, (treatment.fields.Visits || []).join(", ")];
-      treatmentTable.addRow(treatmentData);
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  createUsersTable();
-  createTreatmentsTable();
 });
