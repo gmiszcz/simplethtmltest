@@ -8,7 +8,6 @@ fetch(URL, {
   headers: {
     Authorization: `Bearer ${API_KEY}`,
     "Content-Type": "application/json",
-    "Cache-Control": "no-cache",
   },
 })
   .then((response) => {
