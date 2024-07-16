@@ -59,7 +59,7 @@ async function createUsersTable(users, visits, treatments) {
     return map;
   }, {});
 
-  const userTable = new DataTable("user-table-container", ["Name", "Surname", "Email", "Issues", "Needs", "Visits"]);
+  const userTable = new DataTable("user-table-container", ["Name", "Surname", "Email", "Issues", "Needs", "Visits", "Description"]);
 
   users.forEach((user) => {
     const userVisits = user.fields.Visits || [];
@@ -70,7 +70,7 @@ async function createUsersTable(users, visits, treatments) {
       })
       .join(", ");
 
-    const userData = [user.fields.Name, user.fields.Surname, user.fields.Email, user.fields.Issues, user.fields.Needs, visitNames];
+    const userData = [user.fields.Name, user.fields.Surname, user.fields.Email, user.fields.Issues, user.fields.Needs, visitNames, user.fields.Description];
     userTable.addRow(userData);
   });
 }
